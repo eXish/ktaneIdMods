@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: IdentificationModules
+  title: Identification Modules
+  author: ktane1
+  description: "A collection of Identification Modules by ktane1. So far there's three:\n-
+    Piece Identification \n- VTuber Identification\n- Touhou Identification [still
+    WIP]\nI won't make more ID mods after this."
+  version: 1.0
+  outputFolder: C:\Program Files (x86)\Steam\steamapps\common\Keep Talking and Nobody
+    Explodes\mods
+  previewImage: {fileID: 2800000, guid: b981a5c28ec8ced4eadd6dea58bab0da, type: 3}

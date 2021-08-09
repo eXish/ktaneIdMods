@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Identification Module.unity
+  isLoaded: 1
+  isActive: 1

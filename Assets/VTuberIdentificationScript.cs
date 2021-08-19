@@ -33,6 +33,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 	public Material[] Vtubers;
 	public Material QuestionMark;
 	public Material Nice;
+	public Material egg;
 	
 	public TextMesh[] Text;
 	public TextMesh TextBox;
@@ -277,7 +278,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 		Toggleable = false;
 		ActiveBorder = true;
 		Playable = false;
-        int index = UnityEngine.Random.Range(0, 174);
+        int index = UnityEngine.Random.Range(0, Vtubers.Length);
 		Display.GetComponent<MeshRenderer>().material = Vtubers[index];
 		VTuberName = Display.GetComponent<MeshRenderer>().material.name;
 		VTuberName = VTuberName.Replace(" (Instance)", "");
@@ -293,7 +294,13 @@ public class VTuberIdentificationScript : MonoBehaviour
 	{
 		string Analysis = TextBox.text;
 		TextBox.text = "";
-		if (Analysis == VTuberName)
+		if (Analysis == "Annoying Orange")
+		{
+			ThePieces.clip = SoundEffects[9];
+			ThePieces.Play();
+			Display.GetComponent<MeshRenderer>().material = egg;
+		}
+		else if (Analysis == VTuberName)
 		{
 			Stages++;
 			Playable = false;

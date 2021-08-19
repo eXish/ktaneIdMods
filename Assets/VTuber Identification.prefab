@@ -15927,8 +15927,19 @@ MonoBehaviour:
   - {fileID: 2100000, guid: c79bc5be1a1a8384296cfc7106bcfaaa, type: 2}
   - {fileID: 2100000, guid: 9bbeddb79f177a44a993262d8723e754, type: 2}
   - {fileID: 2100000, guid: 12b0802d05ad5a04c88a0dd0cb706c46, type: 2}
+  - {fileID: 2100000, guid: d85c3feb44192b842a423e1fcc35d27e, type: 2}
+  - {fileID: 2100000, guid: 0b6d2c9370ab50249ad201a9105f7455, type: 2}
+  - {fileID: 2100000, guid: 38f8584c5381428458f3a47939a4403a, type: 2}
+  - {fileID: 2100000, guid: c252167cd5918a24e8fc7f1d1085b454, type: 2}
+  - {fileID: 2100000, guid: e54ad95f1416ea64ba79283fa0619e05, type: 2}
+  - {fileID: 2100000, guid: 6dfc5944df599454490f5f69ee602328, type: 2}
+  - {fileID: 2100000, guid: 261a87a0ed7cb8d4692ff222659a3474, type: 2}
+  - {fileID: 2100000, guid: 30fb1d6ea1877684ebd51cec40593012, type: 2}
+  - {fileID: 2100000, guid: b93b2da2a135aea4192d08232c982f39, type: 2}
+  - {fileID: 2100000, guid: bfff01d6e461205419f3b4a3f607e52e, type: 2}
   QuestionMark: {fileID: 2100000, guid: 060ecc2438a2fde4eb8eb915b6302565, type: 2}
   Nice: {fileID: 2100000, guid: f191ad4e01489b5439979ff6a25c46b9, type: 2}
+  egg: {fileID: 2100000, guid: 280a483fcda4f4f4eb15274a5776954d, type: 2}
   Text:
   - {fileID: 102452785738815594}
   - {fileID: 102280051268560288}
@@ -16042,6 +16053,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8b3774cac75ffe64f85458e68f73b467, type: 3}
   - {fileID: 8300000, guid: 5e9cb3ff17b96f24e9243dd7737c15f4, type: 3}
   - {fileID: 8300000, guid: 04f1c99162a3aa942a15d7890ef7a517, type: 3}
+  - {fileID: 8300000, guid: 35720a92c66988b48b2e93b0bdb58b80, type: 3}
 --- !u!114 &114656736349611826
 MonoBehaviour:
   m_ObjectHideFlags: 1

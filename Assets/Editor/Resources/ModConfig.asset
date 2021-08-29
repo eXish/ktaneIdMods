@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "A collection of Identification Modules by ktane1. So far there's three:\n-
     Piece Identification \n- VTuber Identification\n- Touhou Identification [still
     WIP]\nI won't make more ID mods after this."
-  version: 1.0
+  version: 1.3.2
   outputFolder: C:\Program Files (x86)\Steam\steamapps\common\Keep Talking and Nobody
     Explodes\mods
   previewImage: {fileID: 2800000, guid: b981a5c28ec8ced4eadd6dea58bab0da, type: 3}

@@ -1,17 +1,14 @@
-﻿﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
 
 public class TouhouIdentificationScript : MonoBehaviour
 {
 	public KMAudio Audio;
     public KMBombInfo Bomb;
     public KMBombModule Module;
-	public AudioSource ThePieces;
+	public AudioSource TheMusic;
 	
 	public KMSelectable[] TypableText;
 	public KMSelectable[] ShiftButtons;
@@ -20,11 +17,6 @@ public class TouhouIdentificationScript : MonoBehaviour
 	public KMSelectable Enter;
 	public KMSelectable SpaceBar;
 	public KMSelectable Border;
-	
-	public SpriteRenderer MainSprite;
-    public Sprite Beethoven;
-    public Material[] ImageLighting;
-	public Material[] Background;
 	
 	public MeshRenderer[] LightBulbs;
 	public Material[] TheLights;
@@ -54,7 +46,6 @@ public class TouhouIdentificationScript : MonoBehaviour
 	bool Enterable = false;
 	bool Toggleable = true;
 	int Stages = 0;
-    int SolveSound = 0;
 	
 	//Logging
     static int moduleIdCounter = 1;
@@ -64,7 +55,6 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
-        SolveSound = UnityEngine.Random.Range(0, 50);
 		for (int b = 0; b < TypableText.Count(); b++)
         {
             int KeyPress = b;
@@ -91,7 +81,7 @@ public class TouhouIdentificationScript : MonoBehaviour
             UselessButtons[Useless].OnInteract += delegate
             {
                 UselessButtons[Useless].AddInteractionPunch(.2f);
-				Audio.PlaySoundAtTransform(NotBuffer[0].name, transform);
+				Audio.PlaySoundAtTransform(NotBuffer[0].name, UselessButtons[Useless].transform);
 				return false;
             };
         }
@@ -118,11 +108,10 @@ public class TouhouIdentificationScript : MonoBehaviour
 	{
 		Startup = true;
 		Debug.LogFormat("[Touhou Identification #{0}] The VTubers are ready to stream on Youtube! Better don't miss it now!", moduleId);
-		int index = UnityEngine.Random.Range(0, 2);
-		Surface.GetComponent<MeshRenderer>().material = Background[0];
+		int index = Random.Range(0, 2);
 		Display.GetComponent<MeshRenderer>().material = QuestionMark;
-		ThePieces.clip = SoundEffects[0];
-		ThePieces.Play();
+		TheMusic.clip = SoundEffects[0];
+		TheMusic.Play();
 		yield return new WaitForSecondsRealtime(0.001f);
 		Playable = true;
 		Startup = false;
@@ -131,8 +120,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void TypableKey(int KeyPress)
 	{
 		TypableText[KeyPress].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, TypableText[KeyPress].transform);
 		if (Playable && Enterable)
 		{
 			float width = 0;
@@ -157,9 +145,8 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void PressBackspace()
 	{
 		Backspace.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Backspace.transform);
+		if (Playable)
 		{
 			if (TextBox.text.Length != 0)
 			{
@@ -191,9 +178,8 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void PressSpaceBar()
 	{
 		SpaceBar.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, SpaceBar.transform);
+		if (Playable && Enterable)
 		{
 			float width = 0;
 			foreach (char symbol in TextBox.text)
@@ -225,9 +211,8 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void PressEnter()
 	{
 		Enter.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Enter.transform);
+		if (Playable && Enterable)
 		{
 			StartCoroutine(TheCorrect());
 		}
@@ -236,9 +221,8 @@ public class TouhouIdentificationScript : MonoBehaviour
 	void PressShift(int Shifting)
 	{
 		ShiftButtons[Shifting].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Shifted == true)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, ShiftButtons[Shifting].transform);
+		if (Shifted == true)
 		{
 			Shifted = false;
 			StartingNumber = 0;
@@ -272,7 +256,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 		Toggleable = false;
 		ActiveBorder = true;
 		Playable = false;
-		int index = UnityEngine.Random.Range(0, 63);
+		int index = Random.Range(0, 63);
 		Display.GetComponent<MeshRenderer>().material = Vtubers[index];
 		VTuberName = Display.GetComponent<MeshRenderer>().material.name;
 		VTuberName = VTuberName.Replace(" (Instance)", "");
@@ -299,13 +283,13 @@ public class TouhouIdentificationScript : MonoBehaviour
 				Debug.LogFormat("[Touhou Identification #{0}] Your guess is {1}, which is correct.", moduleId, Analysis);
                 if (Bomb.GetTime() < 60)
                 {
-					ThePieces.Play();
+					TheMusic.Play();
                     LightBulbs[2].material = TheLights[1];
                 }
                 else 
                 {
-					ThePieces.Play();
-					while (ThePieces.isPlaying)
+					TheMusic.Play();
+					while (TheMusic.isPlaying)
 					{
 						LightBulbs[Stages - 1].material = TheLights[1];
 						yield return new WaitForSecondsRealtime(0.075f);
@@ -317,14 +301,15 @@ public class TouhouIdentificationScript : MonoBehaviour
 				Display.GetComponent<MeshRenderer>().material = Nice;
 				LightBulbs[2].material = TheLights[1];		
 				Module.HandlePass();
+				ModuleSolved = true;
 				Animating1 = false;
 			}
 			
 			else
 			{
 				Debug.LogFormat("[Touhou Identification #{0}] Your guess is {1}, which is correct! A stage pass for you.", moduleId, Analysis);
-				ThePieces.Play();
-				while (ThePieces.isPlaying)
+				TheMusic.Play();
+				while (TheMusic.isPlaying)
 				{
 					LightBulbs[Stages - 1].material = TheLights[1];
 					yield return new WaitForSecondsRealtime(0.075f);
@@ -344,10 +329,10 @@ public class TouhouIdentificationScript : MonoBehaviour
 			Debug.LogFormat("[Touhou Identification #{0}] Your guess is {1}, but that's not their name.", moduleId, Analysis);
 			Animating1 = true;
 			Enterable = false;
-			int index = UnityEngine.Random.Range(2, 9);
-			ThePieces.clip = SoundEffects[index];
-			ThePieces.Play();
-			while (ThePieces.isPlaying)
+			int index = Random.Range(2, 9);
+			TheMusic.clip = SoundEffects[index];
+			TheMusic.Play();
+			while (TheMusic.isPlaying)
             {
 				LightBulbs[0].material = TheLights[2];
 				LightBulbs[1].material = TheLights[2];
@@ -498,7 +483,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -534,7 +519,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -566,7 +551,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -620,7 +605,7 @@ public class TouhouIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			

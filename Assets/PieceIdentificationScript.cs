@@ -1,10 +1,7 @@
-﻿﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
 
 public class PieceIdentificationScript : MonoBehaviour
 {
@@ -20,10 +17,6 @@ public class PieceIdentificationScript : MonoBehaviour
 	public KMSelectable Enter;
 	public KMSelectable SpaceBar;
 	public KMSelectable Border;
-	
-	public SpriteRenderer MainSprite;
-    public Sprite Beethoven;
-    public Material[] ImageLighting;
 	
 	public MeshRenderer[] LightBulbs;
 	public Material[] TheLights;
@@ -48,7 +41,6 @@ public class PieceIdentificationScript : MonoBehaviour
 	bool Enterable = false;
 	bool Toggleable = true;
 	int Stages = 0;
-    int SolveSound = 0;
 	
 	//Logging
     static int moduleIdCounter = 1;
@@ -58,7 +50,6 @@ public class PieceIdentificationScript : MonoBehaviour
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
-        SolveSound = UnityEngine.Random.Range(0, 50);
 		for (int b = 0; b < TypableText.Count(); b++)
         {
             int KeyPress = b;
@@ -85,7 +76,12 @@ public class PieceIdentificationScript : MonoBehaviour
             UselessButtons[Useless].OnInteract += delegate
             {
                 UselessButtons[Useless].AddInteractionPunch(.2f);
-				Audio.PlaySoundAtTransform(NotBuffer[0].name, transform);
+				Audio.PlaySoundAtTransform(NotBuffer[0].name, UselessButtons[Useless].transform);
+				if (ThePieces.isPlaying && !Animating1)
+				{
+					ThePieces.Stop();
+					ThePieces.clip = null;
+				}
 				return false;
             };
         }
@@ -112,7 +108,7 @@ public class PieceIdentificationScript : MonoBehaviour
 	{
 		Startup = true;
 		Debug.LogFormat("[Piece Identification #{0}] Module inititated, and it's time to identifying classical pieces correctly. Good luck and show your best.", moduleId);
-        int index = UnityEngine.Random.Range(1, 5);
+        int index = Random.Range(1, 5);
 		ThePieces.clip = NotBuffer[index];
 		ThePieces.Play();
         while (ThePieces.isPlaying)
@@ -126,8 +122,12 @@ public class PieceIdentificationScript : MonoBehaviour
 	void TypableKey(int KeyPress)
 	{
 		TypableText[KeyPress].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, TypableText[KeyPress].transform);
+		if (ThePieces.isPlaying && !StrikeIncoming)
+        {
+			ThePieces.Stop();
+			ThePieces.clip = null;
+        }
 		if (Playable && Enterable)
 		{
 			float width = 0;
@@ -152,9 +152,13 @@ public class PieceIdentificationScript : MonoBehaviour
 	void PressBackspace()
 	{
 		Backspace.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Backspace.transform);
+		if (ThePieces.isPlaying && !Animating1)
+		{
+			ThePieces.Stop();
+			ThePieces.clip = null;
+		}
+		if (Playable)
 		{
 			if (TextBox.text.Length != 0)
 			{
@@ -186,9 +190,13 @@ public class PieceIdentificationScript : MonoBehaviour
 	void PressSpaceBar()
 	{
 		SpaceBar.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, SpaceBar.transform);
+		if (ThePieces.isPlaying && !Animating1)
+		{
+			ThePieces.Stop();
+			ThePieces.clip = null;
+		}
+		if (Playable && Enterable)
 		{
 			float width = 0;
 			foreach (char symbol in TextBox.text)
@@ -220,9 +228,13 @@ public class PieceIdentificationScript : MonoBehaviour
 	void PressEnter()
 	{
 		Enter.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Enter.transform);
+		if (ThePieces.isPlaying && !Animating1)
+		{
+			ThePieces.Stop();
+			ThePieces.clip = null;
+		}
+		if (Playable && Enterable)
 		{
 			StartCoroutine(TheCorrect());
 		}
@@ -231,9 +243,13 @@ public class PieceIdentificationScript : MonoBehaviour
 	void PressShift(int Shifting)
 	{
 		ShiftButtons[Shifting].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Shifted == true)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, ShiftButtons[Shifting].transform);
+		if (ThePieces.isPlaying && !Animating1)
+		{
+			ThePieces.Stop();
+			ThePieces.clip = null;
+		}
+		if (Shifted == true)
 		{
 			Shifted = false;
 			StartingNumber = 0;
@@ -267,7 +283,7 @@ public class PieceIdentificationScript : MonoBehaviour
 		Toggleable = false;
 		ActiveBorder = true;
 		Playable = false;
-        int index = UnityEngine.Random.Range(0, 105);
+        int index = Random.Range(0, 105);
         PlayTheSection = PieceSections[index];
 		ThePieces.clip = PlayTheSection;
 		if (index >= 0 && index < 25)
@@ -365,16 +381,17 @@ public class PieceIdentificationScript : MonoBehaviour
 				Debug.LogFormat("[Piece Identification #{0}] You submitted {1}, which is either the full name of the segment, or you have successfully identified three segments correctly.", moduleId, Analysis);
                 if (Bomb.GetTime() < 60)
                 {
-					int index = UnityEngine.Random.Range(14, 17);
+					int index = Random.Range(14, 17);
 					ThePieces.clip = NotBuffer[index];
 					ThePieces.Play();
                     LightBulbs[2].material = TheLights[1];
 					LightBulbs[1].material = TheLights[1];
 					LightBulbs[0].material = TheLights[1];
+					ThePieces.clip = null;
 				}
                 else 
                 {
-					int index = UnityEngine.Random.Range(14, 17);
+					int index = Random.Range(14, 17);
 					ThePieces.clip = NotBuffer[index];
 					ThePieces.Play();
 					while (ThePieces.isPlaying)
@@ -388,12 +405,14 @@ public class PieceIdentificationScript : MonoBehaviour
 						LightBulbs[0].material = TheLights[0];
 						yield return new WaitForSecondsRealtime(0.075f);
 					}
+					ThePieces.clip = null;
 				}
 				LightBulbs[2].material = TheLights[1];
 				LightBulbs[1].material = TheLights[1];
 				LightBulbs[0].material = TheLights[1];
 				Debug.LogFormat("[Piece Identification #{0}] The module will solve as a reward for you. Good job.", moduleId);
                 Module.HandlePass();
+				ModuleSolved = true;
                 Animating1 = false;
 			}
 			
@@ -401,7 +420,7 @@ public class PieceIdentificationScript : MonoBehaviour
 			{
 				Debug.LogFormat("[Piece Identification #{0}] You submitted {1}, which is correct.", moduleId, Analysis);
 				Animating1 = true;
-				int index = UnityEngine.Random.Range(6, 10);
+				int index = Random.Range(6, 10);
 				ThePieces.clip = NotBuffer[index];
 				ThePieces.Play();
                 while (ThePieces.isPlaying)
@@ -411,7 +430,8 @@ public class PieceIdentificationScript : MonoBehaviour
                     LightBulbs[Stages - 1].material = TheLights[0];
 		            yield return new WaitForSecondsRealtime(0.075f);
                 }
-					 LightBulbs[Stages - 1].material = TheLights[1];
+				ThePieces.clip = null;
+				LightBulbs[Stages - 1].material = TheLights[1];
 				Playable = true;
 				Toggleable = true;
 				Animating1 = false;
@@ -421,8 +441,9 @@ public class PieceIdentificationScript : MonoBehaviour
 		else
 		{
 			Debug.LogFormat("[Piece Identification #{0}] You submitted {1}, but that's wrong.", moduleId, Analysis);
+			StrikeIncoming = true;
 			Animating1 = true;
-			int index = UnityEngine.Random.Range(10, 14);
+			int index = Random.Range(10, 14);
 			ThePieces.clip = NotBuffer[index];
 			ThePieces.Play();
 			Enterable = false;
@@ -437,6 +458,7 @@ public class PieceIdentificationScript : MonoBehaviour
 				LightBulbs[2].material = TheLights[0];
 				yield return new WaitForSecondsRealtime(0.3f);
 			}
+			ThePieces.clip = null;
             Debug.LogFormat("[Piece Identification #{0}] I'm very sorry, but I have to give a strike. Better luck next time!", moduleId);
 			yield return new WaitForSecondsRealtime(0.5f);
 			if (Stages == 0)
@@ -460,18 +482,20 @@ public class PieceIdentificationScript : MonoBehaviour
 			Playable = true;
 			Toggleable = true;
 			Animating1 = false;
+			StrikeIncoming = false;
 			Module.HandleStrike();
 		}
 	}
 	
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"To start the section, use !{0} play | To type in the text box, use !{0} type <text> | To submit, use !{0} submit | To clear the text, use !{0} [clear/fastclear] | Skip animations with !{0} skip (Strike animations cannot be skipped)";
+    private readonly string TwitchHelpMessage = @"To start the section, use !{0} play | To type in the text box, use !{0} type <text> | To submit, use !{0} submit | To clear the text, use !{0} [clear/fastclear] | Skip animations with !{0} skip (Strike and solve animations cannot be skipped)";
     #pragma warning restore 414
 	
 	int StartingNumber = 0;
 	bool Startup = false;
 	bool ActiveBorder = false;
 	bool Animating1 = false;
+	bool StrikeIncoming = false;
 	string Current = "";
 	
 	IEnumerator ProcessTwitchCommand(string command)
@@ -672,10 +696,6 @@ public class PieceIdentificationScript : MonoBehaviour
             {
                 Backspace.OnInteract();
             }
-            else if (Animating1 == true)
-            {
-                Backspace.OnInteract();
-            }
             else
             {
                 yield return "sendtochaterror Nothing's skippable currently. Command was ignored.";
@@ -716,5 +736,103 @@ public class PieceIdentificationScript : MonoBehaviour
 				Backspace.OnInteract();
 			}
 		}
+	}
+
+	IEnumerator TwitchHandleForcedSolve()
+	{
+		if (StrikeIncoming)
+		{
+			StopAllCoroutines();
+			ThePieces.Stop();
+			LightBulbs[0].material = TheLights[1];
+			LightBulbs[1].material = TheLights[1];
+			LightBulbs[2].material = TheLights[1];
+			Module.HandlePass();
+			yield break;
+		}
+		if (Stages != 3)
+        {
+			while (Animating1) yield return true;
+			if (ThePieces.clip != null)
+			{
+				if (Startup)
+				{
+					Backspace.OnInteract();
+					yield return new WaitForSecondsRealtime(0.05f);
+					Border.OnInteract();
+					yield return new WaitForSecondsRealtime(0.05f);
+					Backspace.OnInteract();
+					yield return new WaitForSecondsRealtime(0.05f);
+				}
+				else
+				{
+					Backspace.OnInteract();
+					yield return new WaitForSecondsRealtime(0.05f);
+				}
+			}
+			else if (Toggleable)
+			{
+				Border.OnInteract();
+				yield return new WaitForSecondsRealtime(0.05f);
+				Backspace.OnInteract();
+				yield return new WaitForSecondsRealtime(0.05f);
+			}
+			string piece = pieceName;
+			string sectionName = PlayTheSection.name;
+			if (PlayTheSection.name == "Part III - Coda (2nd)" || PlayTheSection.name == "Part III - Coda (3rd)")
+			{
+				sectionName = "Part III - Coda";
+			}
+			else if (PlayTheSection.name == "Recapitulation, First Subject (3rd)")
+			{
+				sectionName = "Recapitulation, First Subject";
+			}
+			else if (PlayTheSection.name == "Coda (3rd)")
+			{
+				sectionName = "Coda";
+			}
+			else if (PlayTheSection.name == "Exposition, First Subject (3rd)")
+			{
+				sectionName = "Exposition, First Subject";
+			}
+			piece += ", " + sectionName;
+			if (TextBox.text != piece)
+			{
+				int clearNum = -1;
+				for (int j = 0; j < TextBox.text.Length; j++)
+				{
+					if (j == piece.Length)
+						break;
+					if (TextBox.text[j] != piece[j])
+					{
+						clearNum = j;
+						int target = TextBox.text.Length - j;
+						for (int k = 0; k < target; k++)
+						{
+							Backspace.OnInteract();
+							yield return new WaitForSecondsRealtime(0.05f);
+						}
+						break;
+					}
+				}
+				if (clearNum == -1)
+				{
+					if (TextBox.text.Length > piece.Length)
+					{
+						while (TextBox.text.Length > piece.Length)
+						{
+							Backspace.OnInteract();
+							yield return new WaitForSecondsRealtime(0.05f);
+						}
+					}
+					else
+						yield return ProcessTwitchCommand("type " + piece.Substring(TextBox.text.Length));
+				}
+				else
+					yield return ProcessTwitchCommand("type " + piece.Substring(clearNum));
+			}
+			Enter.OnInteract();
+		}
+		while (!ModuleSolved) { yield return true; }
 	}
 }

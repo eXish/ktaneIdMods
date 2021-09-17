@@ -1,17 +1,14 @@
-﻿﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
 
 public class VTuberIdentificationScript : MonoBehaviour
 {
 	public KMAudio Audio;
     public KMBombInfo Bomb;
     public KMBombModule Module;
-	public AudioSource ThePieces;
+	public AudioSource TheMusic;
 	
 	public KMSelectable[] TypableText;
 	public KMSelectable[] ShiftButtons;
@@ -21,9 +18,6 @@ public class VTuberIdentificationScript : MonoBehaviour
 	public KMSelectable SpaceBar;
 	public KMSelectable Border;
 	
-	public SpriteRenderer MainSprite;
-    public Sprite Beethoven;
-    public Material[] ImageLighting;
 	public Material[] DesignBorder;
 	public Material[] Background;
 	public Material[] Logo;
@@ -58,7 +52,6 @@ public class VTuberIdentificationScript : MonoBehaviour
 	bool Enterable = false;
 	bool Toggleable = true;
 	int Stages = 0;
-    int SolveSound = 0;
 	
 	//Logging
     static int moduleIdCounter = 1;
@@ -68,7 +61,6 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
-        SolveSound = UnityEngine.Random.Range(0, 50);
 		for (int b = 0; b < TypableText.Count(); b++)
         {
             int KeyPress = b;
@@ -95,7 +87,7 @@ public class VTuberIdentificationScript : MonoBehaviour
             UselessButtons[Useless].OnInteract += delegate
             {
                 UselessButtons[Useless].AddInteractionPunch(.2f);
-				Audio.PlaySoundAtTransform(NotBuffer[0].name, transform);
+				Audio.PlaySoundAtTransform(NotBuffer[0].name, UselessButtons[Useless].transform);
 				return false;
             };
         }
@@ -122,13 +114,13 @@ public class VTuberIdentificationScript : MonoBehaviour
 	{
 		Startup = true;
 		Debug.LogFormat("[VTuber Identification #{0}] The VTubers are ready to stream on Youtube! Better don't miss it now!", moduleId);
-		int index = UnityEngine.Random.Range(0, 2);
+		int index = Random.Range(0, 2);
 		ModelComponent.GetComponent<MeshRenderer>().material = DesignBorder[index];
 		Surface.GetComponent<MeshRenderer>().material = Background[index];
 		TheLogo.GetComponent<MeshRenderer>().material = Logo[index];
 		Display.GetComponent<MeshRenderer>().material = QuestionMark;
-		ThePieces.clip = SoundEffects[0];
-		ThePieces.Play();
+		TheMusic.clip = SoundEffects[0];
+		TheMusic.Play();
 		yield return new WaitForSecondsRealtime(0.001f);
 		Playable = true;
 		Startup = false;
@@ -137,8 +129,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void TypableKey(int KeyPress)
 	{
 		TypableText[KeyPress].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, TypableText[KeyPress].transform);
 		if (Playable && Enterable)
 		{
 			float width = 0;
@@ -163,9 +154,8 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void PressBackspace()
 	{
 		Backspace.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Backspace.transform);
+		if (Playable)
 		{
 			if (TextBox.text.Length != 0)
 			{
@@ -197,9 +187,8 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void PressSpaceBar()
 	{
 		SpaceBar.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, SpaceBar.transform);
+		if (Playable && Enterable)
 		{
 			float width = 0;
 			foreach (char symbol in TextBox.text)
@@ -231,9 +220,8 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void PressEnter()
 	{
 		Enter.AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Playable && Enterable)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, Enter.transform);
+		if (Playable && Enterable)
 		{
 			StartCoroutine(TheCorrect());
 		}
@@ -242,9 +230,8 @@ public class VTuberIdentificationScript : MonoBehaviour
 	void PressShift(int Shifting)
 	{
 		ShiftButtons[Shifting].AddInteractionPunch(.2f);
-		ThePieces.clip = NotBuffer[0];
-		ThePieces.Play();
-        if (Shifted == true)
+		Audio.PlaySoundAtTransform(NotBuffer[0].name, ShiftButtons[Shifting].transform);
+		if (Shifted == true)
 		{
 			Shifted = false;
 			StartingNumber = 0;
@@ -278,7 +265,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 		Toggleable = false;
 		ActiveBorder = true;
 		Playable = false;
-        int index = UnityEngine.Random.Range(0, Vtubers.Length);
+        int index = Random.Range(0, Vtubers.Length);
 		Display.GetComponent<MeshRenderer>().material = Vtubers[index];
 		VTuberName = Display.GetComponent<MeshRenderer>().material.name;
 		VTuberName = VTuberName.Replace(" (Instance)", "");
@@ -296,8 +283,8 @@ public class VTuberIdentificationScript : MonoBehaviour
 		TextBox.text = "";
 		if (Analysis == "Annoying Orange")
 		{
-			ThePieces.clip = SoundEffects[9];
-			ThePieces.Play();
+			TheMusic.clip = SoundEffects[9];
+			TheMusic.Play();
 			Display.GetComponent<MeshRenderer>().material = egg;
 		}
 		else if (Analysis == VTuberName)
@@ -305,20 +292,20 @@ public class VTuberIdentificationScript : MonoBehaviour
 			Stages++;
 			Playable = false;
 			Enterable = false;
-			ThePieces.clip = SoundEffects[1];
+			TheMusic.clip = SoundEffects[1];
 			if (Stages == 3)
 			{
 				Animating1 = true;
 				Debug.LogFormat("[VTuber Identification #{0}] Your guess is {1}, which is correct.", moduleId, Analysis);
                 if (Bomb.GetTime() < 60)
                 {
-					ThePieces.Play();
+					TheMusic.Play();
                     LightBulbs[2].material = TheLights[1];
                 }
                 else 
                 {
-					ThePieces.Play();
-					while (ThePieces.isPlaying)
+					TheMusic.Play();
+					while (TheMusic.isPlaying)
 					{
 						LightBulbs[Stages - 1].material = TheLights[1];
 						yield return new WaitForSecondsRealtime(0.075f);
@@ -330,14 +317,15 @@ public class VTuberIdentificationScript : MonoBehaviour
 				Display.GetComponent<MeshRenderer>().material = Nice;
 				LightBulbs[2].material = TheLights[1];		
 				Module.HandlePass();
+				ModuleSolved = true;
 				Animating1 = false;
 			}
 			
 			else
 			{
 				Debug.LogFormat("[VTuber Identification #{0}] Your guess is {1}, which is correct! A stage pass for you.", moduleId, Analysis);
-				ThePieces.Play();
-				while (ThePieces.isPlaying)
+				TheMusic.Play();
+				while (TheMusic.isPlaying)
 				{
 					LightBulbs[Stages - 1].material = TheLights[1];
 					yield return new WaitForSecondsRealtime(0.075f);
@@ -355,12 +343,13 @@ public class VTuberIdentificationScript : MonoBehaviour
 		else
 		{
 			Debug.LogFormat("[VTuber Identification #{0}] Your guess is {1}, but that's not their name, strike.", moduleId, Analysis);
+			StrikeIncoming = true;
 			Animating1 = true;
 			Enterable = false;
-			int index = UnityEngine.Random.Range(2, 9);
-			ThePieces.clip = SoundEffects[index];
-			ThePieces.Play();
-			while (ThePieces.isPlaying)
+			int index = Random.Range(2, 9);
+			TheMusic.clip = SoundEffects[index];
+			TheMusic.Play();
+			while (TheMusic.isPlaying)
             {
 				LightBulbs[0].material = TheLights[2];
 				LightBulbs[1].material = TheLights[2];
@@ -396,18 +385,20 @@ public class VTuberIdentificationScript : MonoBehaviour
 			Playable = true;
 			Toggleable = true;
 			Animating1 = false;
+			StrikeIncoming = false;
 			Module.HandleStrike();
 		}
 	}
 	
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"To reveal the VTuber, use !{0} start | To type in the text box, use !{0} type <text> | To submit, use !{0} submit | To clear the text, use !{0} [clear/fastclear] | Skip animations with !{0} skip (Strike animations cannot be skipped)";
+    private readonly string TwitchHelpMessage = @"To reveal the VTuber, use !{0} start | To type in the text box, use !{0} type <text> | To submit, use !{0} submit | To clear the text, use !{0} [clear/fastclear]";
     #pragma warning restore 414
 	
 	int StartingNumber = 0;
 	bool Startup = false;
 	bool ActiveBorder = false;
 	bool Animating1 = false;
+	bool StrikeIncoming = false;
 	string Current = "";
 	
 	IEnumerator ProcessTwitchCommand(string command)
@@ -509,7 +500,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -545,7 +536,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -577,7 +568,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -596,29 +587,6 @@ public class VTuberIdentificationScript : MonoBehaviour
 			Border.OnInteract();
 		}
 
-        else if (Regex.IsMatch(command, @"^\s*skip\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-        {
-            yield return null;
-
-            if (Startup == true)
-            {
-                Backspace.OnInteract();
-            }
-            else if (ActiveBorder == true)
-            {
-                Backspace.OnInteract();
-            }
-            else if (Animating1 == true)
-            {
-                Backspace.OnInteract();
-            }
-            else
-            {
-                yield return "sendtochaterror Nothing's skippable currently. Command was ignored.";
-                yield break;
-            }
-        }
-
         else if (Regex.IsMatch(command, @"^\s*fastclear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
 		{
 			yield return null;
@@ -631,7 +599,7 @@ public class VTuberIdentificationScript : MonoBehaviour
 			
 			if (ActiveBorder == true)
 			{
-				yield return "sendtochaterror The module is still playing the section. Command was ignored";
+				yield return "sendtochaterror The module is still displaying the VTuber. Command was ignored";
 				yield break;
 			}
 			
@@ -652,5 +620,65 @@ public class VTuberIdentificationScript : MonoBehaviour
 				Backspace.OnInteract();
 			}
 		}
+	}
+
+	IEnumerator TwitchHandleForcedSolve()
+	{
+		if (StrikeIncoming)
+		{
+			StopAllCoroutines();
+			TheMusic.Stop();
+			LightBulbs[0].material = TheLights[1];
+			LightBulbs[1].material = TheLights[1];
+			LightBulbs[2].material = TheLights[1];
+			Display.GetComponent<MeshRenderer>().material = Nice;
+			Module.HandlePass();
+			yield break;
+		}
+		int start = Stages;
+		for (int i = start; i < 3; i++)
+		{
+			while (!Playable) { yield return true; }
+			if (Toggleable)
+				Border.OnInteract();
+			while (!Enterable) { yield return true; }
+			if (TextBox.text != VTuberName)
+			{
+				int clearNum = -1;
+				for (int j = 0; j < TextBox.text.Length; j++)
+				{
+					if (j == VTuberName.Length)
+						break;
+					if (TextBox.text[j] != VTuberName[j])
+					{
+						clearNum = j;
+						int target = TextBox.text.Length - j;
+						for (int k = 0; k < target; k++)
+						{
+							Backspace.OnInteract();
+							yield return new WaitForSecondsRealtime(0.05f);
+						}
+						break;
+					}
+				}
+				if (clearNum == -1)
+				{
+					if (TextBox.text.Length > VTuberName.Length)
+					{
+						while (TextBox.text.Length > VTuberName.Length)
+						{
+							Backspace.OnInteract();
+							yield return new WaitForSecondsRealtime(0.05f);
+						}
+					}
+					else
+						yield return ProcessTwitchCommand("type " + VTuberName.Substring(TextBox.text.Length));
+				}
+				else
+					yield return ProcessTwitchCommand("type " + VTuberName.Substring(clearNum));
+			}
+			Enter.OnInteract();
+		}
+		while (!ModuleSolved) { yield return true; }
 	}
 }
